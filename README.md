@@ -14,7 +14,7 @@ Dans le dossier data se trouvent les fichiers necessaires au backend de l'API:
 - l'explainer shap du modèle
 
 
-Pour rappel, dans le repository principal ([a link](https://github.com/estellec18/modele_de_scoring)) nous avons :
+Pour rappel, dans le [repository principal](https://github.com/estellec18/modele_de_scoring)) nous avons :
 - pris connaissance des données (01_EDA.ipynb),
 - entrainé un modèle de classification et analysé les features qui contribuent le plus à ce modèle (02_modelisation.ipynb)
 - analysé le data drift du modèle mis en production (data_drift_report.html)
