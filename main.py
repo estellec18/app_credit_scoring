@@ -19,17 +19,17 @@ app = FastAPI()
 def load():
     """fonction qui charge le modele, l'explainer, le dataset sur lequel va porter l'api et le détail des features 
     utilisés par le modèle"""
-    model = joblib.load("best_xgb_1.joblib")
-    explainer = joblib.load("explainer_xgb_1.joblib")
+    model = joblib.load("./data/best_xgb_1.joblib")
+    explainer = joblib.load("./data/explainer_xgb_1.joblib")
     scaler = model["scaler"]
-    test = pd.read_csv('test.csv', index_col=0)
+    test = pd.read_csv('./data/test.csv', index_col=0)
     test.set_index("SK_ID_CURR", inplace=True)
     # train = pd.read_csv('./data/clean/training.csv', index_col=0)
     # train.drop("TARGET", axis=1, inplace=True)
     # train.set_index("SK_ID_CURR", inplace=True)
     # concat = pd.concat([train, test])
     sub_df = test.sample(n=500, replace=False, random_state=42)
-    features = pd.read_csv('features.csv', index_col=0)
+    features = pd.read_csv('./data/features.csv', index_col=0)
     return model, explainer, scaler, sub_df, features
 
 def create_df_proba(df, seuil:float):
