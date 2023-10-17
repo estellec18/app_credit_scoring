@@ -1,5 +1,4 @@
 # app_credit_scoring
-
 *Projet 7 du parcours Data Science OC*
 
 Ce repository recense les fichiers nécessaires au déploiement de l'API :
@@ -13,7 +12,7 @@ Dans le dossier data se trouvent les fichiers necessaires au backend de l'API:
 - le modèle entrainé
 - l'explainer shap du modèle
 
-##
+#
 
 Pour rappel, dans le [repository principal](https://github.com/estellec18/modele_de_scoring) nous avons :
 - pris connaissance des données (01_EDA.ipynb),
