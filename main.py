@@ -22,15 +22,15 @@ def load():
     model = joblib.load("./data/best_xgb_1.joblib")
     explainer = joblib.load("./data/explainer_xgb_1.joblib")
     scaler = model["scaler"]
-    test = pd.read_csv('./data/test.csv', index_col=0)
+    test = pd.read_csv('./data/sub_test.csv', index_col=0)
     test.set_index("SK_ID_CURR", inplace=True)
     # train = pd.read_csv('./data/clean/training.csv', index_col=0)
     # train.drop("TARGET", axis=1, inplace=True)
     # train.set_index("SK_ID_CURR", inplace=True)
     # concat = pd.concat([train, test])
-    sub_df = test.sample(n=500, replace=False, random_state=42)
+    #sub_df = test.sample(n=500, replace=False, random_state=42)
     features = pd.read_csv('./data/features.csv', index_col=0)
-    return model, explainer, scaler, sub_df, features
+    return model, explainer, scaler, test, features
 
 def create_df_proba(df, seuil:float):
     """fonction qui calcule les probabilités d'un client de faire défault à partir du modèle récupéré via la fonction
