@@ -17,7 +17,7 @@ class UserInput(BaseModel):
 app = FastAPI()
 
 def load():
-    """fonction qui charge le modele, l'explainer, le dataset sur lequel va porter l'api et le détail des features 
+    """fonction qui charge le modèle entrainé, l'explainer, le dataset sur lequel va porter l'api et le détail des features 
     utilisés par le modèle"""
     model = joblib.load("./data/best_xgb_1.joblib")
     explainer = joblib.load("./data/explainer_xgb_1.joblib")
@@ -34,7 +34,7 @@ def load():
 
 def create_df_proba(df, seuil:float):
     """fonction qui calcule les probabilités d'un client de faire défault à partir du modèle récupéré via la fonction
-    load() et le seuil"""
+    load() et le seuil optimisé"""
     proba = model.predict_proba(df)
     df_proba = pd.DataFrame({'client_num':df.index, "proba_no_default":proba.transpose()[0], "proba_default":proba.transpose()[1]})
     df_proba["prediction"] = np.where(df_proba["proba_default"] > seuil, 1, 0)
@@ -46,10 +46,13 @@ pred_data = create_df_proba(data, seuil_predict)
 
 @app.get("/")
 def read_root():
+    """permet de vérifier visuellement que l'API s'est bien connecté"""
     return {"message": "Welcome to the API"}
 
 @app.post("/id_client")
 def get_list_id():
+    """fonction qui renvoie les liste des id client (nécessaire pour identifier les clients opur lesquels on souhaite avoir la proba de défault) 
+    et la liste des variables du modèle (nécessaire pour explication des résultats)"""
     list_id = data.index.to_list()
     list_feature = features["Row"].to_list()
     return {"list_id":list_id,
@@ -57,6 +60,7 @@ def get_list_id():
 
 @app.post("/predict")
 def predict(item:UserInput):
+    """fonction qui renvoie un message (crédit accepté ou refusé) et la probabilité de défault pour un client donné"""
     results = pred_data[pred_data["client_num"]==item.num_client]
     if results["prediction"].values==0:
         verdict="Demande de crédit acceptée ✅"
@@ -68,6 +72,7 @@ def predict(item:UserInput):
   
 @app.post("/gauge")
 def gauge(item:UserInput):
+    """visualisation de la probabilité de défaut d'un client donné sous forme de jauge"""
     value = pred_data[pred_data["client_num"]==item.num_client]["proba_default"].values[0]
     if value > seuil_predict:
         color = "orange"
@@ -88,16 +93,19 @@ def gauge(item:UserInput):
 
 @app.post("/description")
 def get_description(item:UserInput):
+    """renvoie la description d'une variable donnée"""
     result = features[features["Row"]==item.feat]["Description"].values[0]
     return {"description":str(result)}
 
 
 def st_shap(plot, height=None):
-   shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
-   return shap_html
+    """permet de transformer un force plot shap en html pour visualisation sur streamlit"""
+    shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
+    return shap_html
 
 @app.post("/explanation")
 def get_explanation(item:UserInput):
+    """pour un client donnée renvoie (1) un dataframe avec les 10 variables principales expliquant la décision d'accorder ou de refuser le crédit et (2) un force plot"""
     scaled_data = scaler.transform(data)
     idx = pred_data.index[pred_data["client_num"]==item.num_client].values[0]
     data_idx = scaled_data[idx].reshape(1,-1)
@@ -126,6 +134,7 @@ def get_explanation(item:UserInput):
 
 @app.post("/perso_info")
 def get_perso(item:UserInput):
+    """pour un client donné renvoie un ensemble d'information (age, sexe, métier...)"""
     df = data.reset_index()
     
     gender = int(df[df["SK_ID_CURR"]==item.num_client]["CODE_GENDER"].values[0])

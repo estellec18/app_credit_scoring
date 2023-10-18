@@ -48,7 +48,7 @@ def test_credit():
     model, explainer, scaler, data, features = load()
     assert data["AMT_CREDIT"].min() > 0
 
-# les tests suivant sont relatifs au bon fonctionnement de la connection avec l'API
+# les tests suivant sont relatifs au bon fonctionnement de la connection avec l'API & que les résultats renvoyés sont cohérents
 
 def test_can_call_endpoint():
     response = client.get('/')
