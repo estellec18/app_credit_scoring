@@ -12,16 +12,16 @@ Dans le dossier data se trouvent les fichiers necessaires au backend de l'API:
 - un subset des données clients qui sont soumis au modèle [sub_test.csv](data/sub_test.csv)
 - une définition des différentes features du modèle [features.csv](data/features.csv)
 - le modèle entrainé [best_xgb_1.joblib](data/best_xgb_1.joblib)
-- l'explainer shap du modèle [explainer_xgb_1.joblib](data/explainer_xgb_1.joblib
+- l'explainer shap du modèle [explainer_xgb_1.joblib](data/explainer_xgb_1.joblib)
 
 #
 
 Pour rappel, dans le [repository principal](https://github.com/estellec18/modele_de_scoring) nous avons :
-(1) pris connaissance des données [01_EDA.ipynb](https://github.com/estellec18/modele_de_scoring/01_EDA.ipynb)
-(2) entrainé un modèle de classification et analysé les features qui contribuent le plus à ce modèle [02_Modelisation.ipynb](https://github.com/estellec18/modele_de_scoring/02_Modelisation.ipynb)
-(3) analysé le data drift du modèle mis en production [data_drift_report_global.html](https://github.com/estellec18/modele_de_scoring/data_drift_report_global.html)
+* pris connaissance des données (01_EDA.ipynb)
+* entrainé un modèle de classification et analysé les features qui contribuent le plus à ce modèle (02_Modelisation.ipynb)
+* analysé le data drift du modèle mis en production (data_drift_report_global.html)
 
-Le repository principal comprend également l'interface de test Streamlit [frontend.py](https://github.com/estellec18/modele_de_scoring/frontend.py) de l'API.
+Le repository principal comprend également l'interface de test Streamlit (frontend.py) de l'API.
 
 
 
