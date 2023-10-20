@@ -41,7 +41,7 @@ def create_df_proba(df, seuil:float):
     return df_proba
 
 model, explainer, scaler, data, features = load()
-seuil_predict = 0.5
+seuil_predict = 0.3
 pred_data = create_df_proba(data, seuil_predict)
 
 @app.get("/")
@@ -73,20 +73,20 @@ def predict(item:UserInput):
 @app.post("/gauge")
 def gauge(item:UserInput):
     """visualisation de la probabilité de défaut d'un client donné sous forme de jauge"""
-    value = pred_data[pred_data["client_num"]==item.num_client]["proba_default"].values[0]
-    if value > seuil_predict:
-        color = "orange"
-    else:
+    value = pred_data[pred_data["client_num"]==item.num_client]["proba_no_default"].values[0]
+    if value > 1 - seuil_predict:
         color = "green"
+    else:
+        color = "orange"
     fig = go.Figure(go.Indicator(
         domain = {'x': [0, 1], 'y': [0, 1]},
         value = value,
         mode = "gauge+number+delta",
-        title = {'text': "Probabilité de défault"},
-        delta = {'reference': seuil_predict, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
+        title = {'text': "Score"},
+        delta = {'reference': 1 - seuil_predict, 'increasing': {'color': "green"}, 'decreasing': {'color': "red"}},
         gauge = {'axis': {'range': [None, 1]},
                 'bar' : {'color':color},
-                'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': seuil_predict}}))
+                'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': 1 - seuil_predict}}))
     fig_html = fig.to_html(fig) # pas trouver d'autres moyen que de convertir en html
     return{"fig":fig_html}
 
