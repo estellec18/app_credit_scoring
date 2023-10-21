@@ -6,6 +6,8 @@ name: CI app_credit_scoring
 on:
   push:
     branches: [ "main" ]
+  deployment:
+    branches: [ "main" ]
 
 jobs:
   build:
