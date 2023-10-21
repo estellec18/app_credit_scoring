@@ -41,12 +41,12 @@ def create_df_proba(df, seuil:float):
     return df_proba
 
 model, explainer, scaler, data, features = load()
-seuil_predict = 0.3
+seuil_predict = 0.25 #cf. travaux de modélisation (le profit est maximal pour un seuil à 0.225, arrondis à 0.25 pour cet exercice)
 pred_data = create_df_proba(data, seuil_predict)
 
 @app.get("/")
 def read_root():
-    """permet de vérifier visuellement que l'API s'est bien connecté"""
+    """permet de vérifier visuellement que l'API s'est bien connectée"""
     return {"message": "Welcome to the API"}
 
 @app.post("/id_client")
