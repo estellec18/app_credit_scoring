@@ -17,14 +17,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Python 3.9.6
       uses: actions/setup-python@v3
       with:
         python-version: "3.9.6"
+        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements.tx
+        
     - name: Test with pytest
       run: |
         pytest test_main.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        
+    - name: Deploy
+    - uses: akhileshns/heroku-deploy@v3.12.14
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: ${{secrets.HEROKU_APP}}
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
