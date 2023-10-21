@@ -19,8 +19,8 @@ app = FastAPI()
 def load():
     """fonction qui charge le modèle entrainé, l'explainer, le dataset sur lequel va porter l'api et le détail des features 
     utilisés par le modèle"""
-    model = joblib.load("./data/best_xgb_1.joblib")
-    explainer = joblib.load("./data/explainer_xgb_1.joblib")
+    model = joblib.load("./data/best_xgb_1_2.joblib")
+    explainer = joblib.load("./data/explainer_xgb_1_2.joblib")
     scaler = model["scaler"]
     test = pd.read_csv('./data/sub_test.csv', index_col=0)
     test.set_index("SK_ID_CURR", inplace=True)
@@ -41,7 +41,7 @@ def create_df_proba(df, seuil:float):
     return df_proba
 
 model, explainer, scaler, data, features = load()
-seuil_predict = 0.25 #cf. travaux de modélisation (le profit est maximal pour un seuil à 0.225, arrondis à 0.25 pour cet exercice)
+seuil_predict = 0.20 #cf. travaux de modélisation (le profit est maximal pour un seuil à 0.20)
 pred_data = create_df_proba(data, seuil_predict)
 
 @app.get("/")
