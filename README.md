@@ -9,7 +9,7 @@ Ce repository recense les fichiers nécessaires au déploiement de l'API :
 - [requirements.txt](requirements.txt), [Procfile](Procfile), [runtime.txt](runtime.txt) : fichiers indispensables pour le déploiement via Heroku
 
 Dans le dossier data se trouvent les fichiers necessaires au backend de l'API:
-- un subset des données clients qui sont soumis au modèle [sub_test.csv](data/sub_test.csv)
+- un subset des données clients soumis au modèle pour tester l'API [sub_test.csv](data/sub_test.csv)
 - une définition des différentes features du modèle [features.csv](data/features.csv)
 - le modèle entrainé [best_xgb_1.joblib](data/best_xgb_1.joblib)
 - l'explainer shap du modèle [explainer_xgb_1.joblib](data/explainer_xgb_1.joblib)
@@ -22,6 +22,14 @@ Pour rappel, dans le [repository principal](https://github.com/estellec18/modele
 * analysé le data drift du modèle mis en production (data_drift_report_global.html)
 
 Le repository principal comprend également l'interface de test Streamlit (frontend.py) de l'API.
+Fonctionnement de l'interface :
+- l'utilisateur choisit (dans une liste déroulante) le numéro du client dont il souhaite connaitre les résultats
+- l'utilisateur clique sur le bouton "Prédiction" pour générer :
+    - des informations générales sur le client en question (sexe, revenue, occupation...)
+    - la probabilité de défault du client ainsi que sa classe (accepté ou refusé)
+    - la visualisation du score du client sur une jauge
+    - des informations concernant les principales features responsables du score
+
 
 
 
