@@ -22,7 +22,7 @@ def load():
     model = joblib.load("./data/best_xgb_1_2.joblib")
     explainer = joblib.load("./data/explainer_xgb_1_2.joblib")
     scaler = model["scaler"]
-    test = pd.read_csv('./data/sub_test.csv', index_col=0)
+    test = pd.read_csv('./data/sub_test.csv.zip', index_col=0)
     test.set_index("SK_ID_CURR", inplace=True)
     # train = pd.read_csv('./data/clean/training.csv', index_col=0)
     # train.drop("TARGET", axis=1, inplace=True)
