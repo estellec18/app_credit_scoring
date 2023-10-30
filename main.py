@@ -1,11 +1,17 @@
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+import json
 from pydantic import BaseModel
 import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import joblib
 import plotly.graph_objects as go
 import shap
+
+matplotlib.use('agg')
 
 # uvicorn main:app --reload in terminal
 # http://127.0.0.1:8000/ => endpoint/route/api
@@ -22,13 +28,8 @@ def load():
     model = joblib.load("./data/best_xgb_1_2.joblib")
     explainer = joblib.load("./data/explainer_xgb_1_2.joblib")
     scaler = model["scaler"]
-    test = pd.read_csv('./data/sub_test.csv.zip', index_col=0)
+    test = pd.read_csv('./data/sub_test.csv', index_col=0)
     test.set_index("SK_ID_CURR", inplace=True)
-    # train = pd.read_csv('./data/clean/training.csv', index_col=0)
-    # train.drop("TARGET", axis=1, inplace=True)
-    # train.set_index("SK_ID_CURR", inplace=True)
-    # concat = pd.concat([train, test])
-    #sub_df = test.sample(n=500, replace=False, random_state=42)
     features = pd.read_csv('./data/features.csv', index_col=0)
     return model, explainer, scaler, test, features
 
@@ -51,12 +52,20 @@ def read_root():
 
 @app.post("/id_client")
 def get_list_id():
-    """fonction qui renvoie les liste des id client (nécessaire pour identifier les clients opur lesquels on souhaite avoir la proba de défault) 
+    """fonction qui renvoie les liste des id client (nécessaire pour identifier les clients pour lesquels on souhaite avoir la proba de défault) 
     et la liste des variables du modèle (nécessaire pour explication des résultats)"""
     list_id = data.index.to_list()
-    list_feature = features["Row"].to_list()
+    list_feature = features["Row"].to_list()[2:]
     return {"list_id":list_id,
             "list_feat":list_feature}
+
+@app.post("/get_data")
+def get_data():
+    #model, explainer, scaler, subset, features = load()
+    #df_data = subset.to_dict()
+    #df_feat = features.to_dict()
+    df_data = data.to_dict()
+    return {"data": df_data}
 
 @app.post("/predict")
 def predict(item:UserInput):
@@ -66,7 +75,7 @@ def predict(item:UserInput):
         verdict="Demande de crédit acceptée ✅"
     else:
         verdict="Demande de crédit refusée ⛔"
-    proba = f"Nous estimons la probabilité de default du client à : {results['proba_default'].values[0]*100:.2f}%"
+    proba = f"Nous estimons la probabilité de default du client à {results['proba_default'].values[0]*100:.2f}%"
     return {"verdict":verdict, 
             "proba":proba}
   
@@ -82,11 +91,12 @@ def gauge(item:UserInput):
         domain = {'x': [0, 1], 'y': [0, 1]},
         value = value,
         mode = "gauge+number+delta",
-        title = {'text': "Score"},
+        title = {'text': "Score",'font': {'size': 15}},
         delta = {'reference': 1 - seuil_predict, 'increasing': {'color': "green"}, 'decreasing': {'color': "red"}},
         gauge = {'axis': {'range': [None, 1]},
                 'bar' : {'color':color},
                 'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': 1 - seuil_predict}}))
+    fig.update_layout(autosize=False,width=400,height=350)
     fig_html = fig.to_html(fig) # pas trouver d'autres moyen que de convertir en html
     return{"fig":fig_html}
 
@@ -105,20 +115,27 @@ def st_shap(plot, height=None):
 
 @app.post("/explanation")
 def get_explanation(item:UserInput):
-    """pour un client donnée renvoie (1) un dataframe avec les 10 variables principales expliquant la décision d'accorder ou de refuser le crédit et (2) un force plot"""
+    """pour un client donnée renvoie (1) un dataframe avec les 9 variables principales expliquant la décision d'accorder ou de refuser le crédit et (2) un force plot"""
     scaled_data = scaler.transform(data)
     idx = pred_data.index[pred_data["client_num"]==item.num_client].values[0]
     data_idx = scaled_data[idx].reshape(1,-1)
     shap_values = explainer.shap_values(data_idx, l1_reg="aic")
-    fig = st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1][0], data_idx[0],feature_names=data.columns))
+    # waterfall
+    #exp = shap.Explanation(shap_values[1], explainer.expected_value[1], data_idx, feature_names=data.columns)
+    #fig = st_shap(shap.plots.waterfall(exp[0]))
+    #forceplot
+    fig = st_shap(shap.force_plot(explainer.expected_value[0], shap_values[0][0], data_idx[0],feature_names=data.columns))
     
     df_shap = pd.DataFrame(shap_values[1], columns=data.columns)
     list_feat = []
+    shap_val = []
     for i in range(9):
         max_col = df_shap.abs().max().idxmax()
         list_feat.append(max_col)
+        shap_val.append(df_shap[max_col].values[0])
         df_shap.drop(max_col, axis=1, inplace=True)
     df_feat = data[data.index==item.num_client][list_feat].transpose().round(2)
+    df_feat["Shap_value"] = np.array(shap_val).round(4)
 
     list_feat = df_feat.index.to_list()
     descr = []
@@ -126,7 +143,10 @@ def get_explanation(item:UserInput):
         desc = features[features["Row"]==feat]["Description"].values[0]
         descr.append(desc)
     
-    df_feat.insert(column="Description", value=descr, loc=1)
+    df_feat.insert(column="Description", value=descr, loc=2)
+    df_feat.reset_index()
+    df_feat = df_feat[[item.num_client,"Shap_value", "Description"]]
+    df_feat.rename(columns={item.num_client:'Value'},inplace=True)
 
     return{"df_feat":df_feat,
            "fig":fig}
@@ -154,15 +174,3 @@ def get_perso(item:UserInput):
            "credit": credit,
            "income_type":income_type,
            "family":family}
-
-
-# takes too long ou message d'erreur du mac
-# @app.post("/for_waterfall")
-# def get_waterfall(item:UserInput):
-#     scaled_data = scaler.transform(data)
-#     idx = pred_data.index[pred_data["client_num"]==item.num_client].values[0]
-#     data_idx = scaled_data[idx].reshape(1,-1)
-#     shap_values = explainer.shap_values(data, l1_reg="aic")
-#     exp = shap.Explanation(shap_values[1], explainer.expected_value[1], data_idx, feature_names=data.columns)
-#     fig = st_shap(shap.plots.waterfall(exp[0]))
-#     return{"waterfall":fig}
