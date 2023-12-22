@@ -1,5 +1,5 @@
 # app_credit_scoring
-*Projet 7 du parcours Data Science OC*
+*Projet développé dans le cadre de la formation Data Scientist OC (RNCP niveau 7)*
 
 [lien vers le repository principal de ce projet](https://github.com/estellec18/modele_de_scoring)
 
@@ -22,13 +22,14 @@ Pour rappel, dans le [repository principal](https://github.com/estellec18/modele
 * analysé le data drift du modèle mis en production (data_drift_report.html)
 
 Le repository principal comprend également l'interface de test Streamlit (frontend.py) de l'API.
+
 Fonctionnement de l'interface :
 - l'utilisateur choisit (dans une liste déroulante) le numéro du client dont il souhaite connaitre les résultats
 - l'utilisateur clique sur le bouton "Prédiction" pour générer :
     - des informations générales sur le client en question (sexe, revenue, occupation...)
     - la probabilité de défault du client ainsi que sa classe (accepté ou refusé)
     - la visualisation du score du client sur une jauge
-    - des informations concernant les principales features responsables du score
+    - des informations concernant les principales features responsables du score et le positionnement du client par rapport au reste de la population
 
 
 
