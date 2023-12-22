@@ -23,7 +23,7 @@ Pour rappel, dans le [repository principal](https://github.com/estellec18/modele
 
 Le repository principal comprend également l'interface de test Streamlit (frontend.py) de l'API.
 
-Fonctionnement de l'interface :
+Fonctionnement de l'interface - [lien vers le repository du dashboard](https://github.com/estellec18/dashboard_credit_scoring) :
 - l'utilisateur choisit (dans une liste déroulante) le numéro du client dont il souhaite connaitre les résultats
 - l'utilisateur clique sur le bouton "Prédiction" pour générer :
     - des informations générales sur le client en question (sexe, revenue, occupation...)
