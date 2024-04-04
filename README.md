@@ -1,5 +1,5 @@
 # app_credit_scoring
-*Projet développé dans le cadre de la formation Data Scientist OC (RNCP niveau 7)*
+*Projet développé dans le cadre du parcours Data Scientist d'OpenClassrooms en partenariat avec CentralSupélec (RNCP niveau 7)*
 
 [lien vers le repository principal de ce projet](https://github.com/estellec18/modele_de_scoring)
 
